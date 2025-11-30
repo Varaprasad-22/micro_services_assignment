@@ -14,5 +14,6 @@
   <modules>
   	
   	<module>flightsystem</module>
+  	<module>bookingsystem</module>
   </modules>
 </project>
