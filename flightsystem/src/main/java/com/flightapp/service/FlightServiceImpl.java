@@ -9,8 +9,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import com.flightapp.controller.FlightController;
 import com.flightapp.dto.Flight;
 import com.flightapp.model.Airline;
 import com.flightapp.model.FlightEntity;
@@ -20,13 +21,17 @@ import com.flightapp.exceptions.ResourceNotFoundException;
 import com.flightapp.repository.AirlineRepository;
 import com.flightapp.repository.FlightRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class FlightServiceImpl implements FlightService {
+
 
 	@Autowired
 	private FlightRepository flightRepository;
 	@Autowired
 	private AirlineRepository airlineRepository;
+
 
 	@Override
 	public int addFlight(Flight flightRequest) {
@@ -113,6 +118,47 @@ public class FlightServiceImpl implements FlightService {
 
 			return flightRequestDto;
 		}).collect(Collectors.toList());
+	}
+
+	@Override
+	public ResponseEntity<Flight> getById(Integer flightId) {
+		// TODO Auto-generated method stub
+		Optional<FlightEntity> flightdata=flightRepository.findById(flightId);
+		if(flightdata.isEmpty()) {
+			throw new ResourceNotFoundException("No flight with that id");
+		}
+		FlightEntity entity=flightdata.get();
+		Flight dto = new Flight();
+		Optional<Airline> air=airlineRepository.findByAirlineId(entity.getAirlineId());
+		if(air.isEmpty())
+		{
+			throw new ResourceNotFoundException("No airline with that id");
+		}
+		Airline air1=air.get();
+		dto.setAirlineName(air1.getAirlineName());
+        dto.setFlightId(flightId);
+        dto.setFlightNumber(entity.getFlightNumber());
+        dto.setFromPlace(entity.getFromLocation());
+        dto.setArrivalTime(entity.getArrivalTime());
+        dto.setDepatureTime(entity.getDepatureTime());
+        dto.setToPlace(entity.getToLocation());
+        dto.setTotalSeats(entity.getAvaliSeats());
+        dto.setPrice(entity.getPrice());
+		return ResponseEntity.ok(dto);
+	}
+
+	@Override
+	@Transactional
+	public void updateDetails(Integer flightId, Integer changeInSeats) {
+		// TODO Auto-generated method stub
+		Optional<FlightEntity> flightdata=flightRepository.findById(flightId);
+		if(flightdata.isEmpty()) {
+			throw new ResourceNotFoundException("No flight with that id");
+		}
+		FlightEntity entity=flightdata.get();
+		entity.setAvaliSeats(entity.getAvaliSeats()+changeInSeats);
+		flightRepository.save(entity);
+		return;
 	}
 
 }

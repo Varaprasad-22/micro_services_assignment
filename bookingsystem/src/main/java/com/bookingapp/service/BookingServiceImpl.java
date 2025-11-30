@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bookingapp.client.FlightServiceClient;
-import com.bookingapp.dto.BookingGetResponse;
+import com.bookingapp.dto.BookingGetResponse; 
 import com.bookingapp.dto.Bookingdto;
 import com.bookingapp.dto.FlightDto;
 import com.bookingapp.dto.Passengers;
@@ -45,19 +45,19 @@ public class BookingServiceImpl implements BookingService {
 		
 		int outboundId = data.getOutboundFlightId();
 
-		FlightDto outboundFlight = flightServiceClient.getFlightDetails(data.getOutboundFlightId())
+		FlightDto outboundFlight = flightserviceclient.getFlightDetails(data.getOutboundFlightId())
 				.orElseThrow(() -> new ResourceNotFoundException("Outbound flight not found"));
 
-		if (outboundFlight.getAvailSeats() < data.getNoOfSeats()) {
+		if (outboundFlight.getTotalSeats() < data.getNoOfSeats()) {
 			throw new BookingException("Not enough seats in outbound flight.");
 		}
 
 		
 
 		BookingEntity bookingEntity = new BookingEntity();
-		bookingEntity.setUser(userId);
+		bookingEntity.setUserId(userId);
 		bookingEntity.setEmailId(data.getEmailId());
-		bookingEntity.setFlight(data.getOutboundFlightId());
+		bookingEntity.setFlightId(data.getOutboundFlightId());
 		bookingEntity.setNoOfSeats(data.getNoOfSeats());
 		bookingEntity.setStatus(true);
 		bookingEntity.setBookingTime(LocalDateTime.now());
@@ -80,14 +80,15 @@ public class BookingServiceImpl implements BookingService {
 			FlightDto returnFlight = flightserviceclient.getFlightDetails(returnId)
 					.orElseThrow(() -> new ResourceNotFoundException("Return flight not found"));
 
-			if (returnFlight.getAvaliSeats() < data.getNoOfSeats()) {
+			if (returnFlight.getTotalSeats() < data.getNoOfSeats()) {
+
+				flightserviceclient.updateSeats(data.getOutboundFlightId(),data.getNoOfSeats());
 				throw new BookingException("Not enough seats in return flight.");
 			}
 
-			bookingEntity.setReturnFlight(returnFlight);
-			returnFlight.setAvaliSeats(returnFlight.getAvaliSeats() - data.getNoOfSeats());
-			flightRepository.save(returnFlight);
-
+			bookingEntity.setReturnFlight(returnId);
+			flightserviceclient.updateSeats(data.getOutboundFlightId(),data.getNoOfSeats()*-1);
+			
 			bookingRepository.save(bookingEntity);
 
 			return "Round-trip Booking Successful! PNR: " + bookingEntity.getPnr();
@@ -119,10 +120,14 @@ public class BookingServiceImpl implements BookingService {
 		if (!bookingOpt.isPresent()) {
 			throw new ResourceNotFoundException("No booking found with PNR: " + pnr);
 		}
+
 		BookingEntity bookingEntity = bookingOpt.get();
+		FlightDto flightDetails = flightserviceclient.getFlightDetails(
+			    (bookingEntity.getFlightId())
+			).orElse(null);
 		BookingGetResponse response = new BookingGetResponse();
 		response.setPnr(bookingEntity.getPnr());
-		response.setFlightId(String.valueOf(bookingEntity.getFlight().getFlightId()));
+		response.setFlightId(String.valueOf(bookingEntity.getFlightId()));
 		List<Passengers> passengersList = bookingEntity.getPassengers().stream().map(entity -> {
 			Passengers passengerDto = new Passengers();
 			passengerDto.setName(entity.getName());
@@ -138,7 +143,6 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	@Transactional
 	public String cancelTicket(String pnr) {
 		// TODO Auto-generated method stub
 		Optional<BookingEntity> bookingOpt = bookingRepository.findByPnr(pnr);
@@ -146,7 +150,7 @@ public class BookingServiceImpl implements BookingService {
 			throw new ResourceNotFoundException("Cancellation Failed: PNR not found.");
 		}
 		BookingEntity bookingEntity = bookingOpt.get();
-		LocalDateTime flightDepartureTime = bookingEntity.getFlight().getDepatureTime();
+		LocalDateTime flightDepartureTime = bookingEntity.getBookingTime();
 		LocalDateTime currentTime = LocalDateTime.now();
 		long hoursRemaining = Duration.between(currentTime, flightDepartureTime).toHours();
 
@@ -154,10 +158,10 @@ public class BookingServiceImpl implements BookingService {
 			throw new BookingException(
 					"Cancellation Failed: Cannot cancel ticket less than 24 hours before journey date.");
 		}
-		FlightEntity flightEntity = bookingEntity.getFlight();
-		flightEntity.setAvaliSeats(flightEntity.getAvaliSeats() + bookingEntity.getNoOfSeats());
-		flightRepository.save(flightEntity);
-		bookingRepository.deleteByPnr(pnr);
+//		FlightDto flightEntity = bookingEntity.getFlight();
+		flightserviceclient.updateSeats(bookingEntity.getFlightId(),bookingEntity.getNoOfSeats());
+		bookingEntity.setStatus(false);
+		bookingRepository.save(bookingEntity);
 		return "Ticket with PNR " + pnr + " successfully cancelled.";
 	}
 
@@ -175,8 +179,11 @@ public class BookingServiceImpl implements BookingService {
 				Bookingdto bookingDto = new Bookingdto();
 				bookingDto.setEmailId(booking.getEmailId());
 				bookingDto.setNoOfSeats(booking.getNoOfSeats());
-				if (booking.getUser() != null) {
-					bookingDto.setName(booking.getUser().getName());
+				if (booking.getUserId() != null) {
+					User user=new User();
+					Optional<User> name=userRepository.findById(booking.getUserId());
+					
+					bookingDto.setName(name.get().getName());
 				}
 				List<Passengers> passengerDtoList = new ArrayList<>();
 				for (PassengerEntity passengerEntity : booking.getPassengers()) {

@@ -24,7 +24,7 @@ public class BookingEntity {
 	private String userId;
 	private Integer flightId;
 	private LocalDateTime bookingTime;
-	private String returnFlight;
+	private Integer returnFlight;
 	private int noOfSeats;
 	private boolean status;
 	public String getBookingId() {
@@ -103,11 +103,31 @@ public class BookingEntity {
 		 this.bookingTime = bookingTime;
 	 }
 
-	 public String getReturnFlight() {
+	 public Integer getReturnFlight() {
 		 return returnFlight;
 	 }
 
-	 public void setReturnFlight(String  returnFlight) {
+	 public void setReturnFlight(Integer  returnFlight) {
 		 this.returnFlight = returnFlight;
+	 }
+
+	 public String getUserId() {
+		 return userId;
+	 }
+
+	 public void setUserId(String userId) {
+		 this.userId = userId;
+	 }
+
+	 public Integer getFlightId() {
+		 return flightId;
+	 }
+
+	 public void setFlightId(Integer flightId) {
+		 this.flightId = flightId;
+	 }
+
+	 public LocalDateTime getBookingTime() {
+		 return bookingTime;
 	 }
 }

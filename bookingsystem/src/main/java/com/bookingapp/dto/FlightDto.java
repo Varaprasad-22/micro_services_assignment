@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class FlightDto {
 
 	private Integer flightId;
-	private Integer availSeats;
+	private Integer totalSeats;
 	private LocalDateTime depatureTime;
 	private String fromLocation;
     private String toLocation;
@@ -24,11 +24,11 @@ public class FlightDto {
 	public void setFlightId(Integer flightId) {
 		this.flightId = flightId;
 	}
-	public Integer getAvailSeats() {
-		return availSeats;
+	public Integer getTotalSeats() {
+		return totalSeats;
 	}
 	public void setAvailSeats(Integer availSeats) {
-		this.availSeats = availSeats;
+		this.totalSeats = availSeats;
 	}
 	public LocalDateTime getDepatureTime() {
 		return depatureTime;
@@ -59,5 +59,8 @@ public class FlightDto {
 	}
 	public void setAirlineName(String airlineName) {
 		this.airlineName = airlineName;
+	}
+	public void setTotalSeats(Integer totalSeats) {
+		this.totalSeats = totalSeats;
 	}
 }

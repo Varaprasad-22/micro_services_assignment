@@ -3,17 +3,37 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.4</version> <relativePath/>
-    </parent>
+    <version>3.2.4</version> 
+    <relativePath/>
+  </parent>
+  
   <groupId>flight_booking_microservice</groupId>
   <artifactId>flightbooking</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>flightbooking</name>
   <packaging>pom</packaging>
   <description>Micro Flight Booking</description>
+  
+  <properties>
+    <spring-cloud.version>2023.0.1</spring-cloud.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      
+    </dependencies>
+  </dependencyManagement>
+
   <modules>
-  	
-  	<module>flightsystem</module>
-  	<module>bookingsystem</module>
+    <module>flightsystem</module>
+    <module>bookingsystem</module>
+    <module>eureka</module>
   </modules>
 </project>

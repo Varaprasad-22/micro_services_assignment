@@ -10,7 +10,7 @@ import com.bookingapp.dto.BookingGetResponse;
 import com.bookingapp.model.BookingEntity;
 
 @Repository
-public interface BookingRepository extends MongoRepository<BookingEntity, Integer>{
+public interface BookingRepository extends MongoRepository<BookingEntity, String>{
 
 
 	List<BookingEntity> findAllByEmailId(String emailId);

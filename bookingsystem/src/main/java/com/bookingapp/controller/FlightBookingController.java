@@ -33,9 +33,9 @@ public class FlightBookingController {
 	private BookingService bookingService;
 
 	@PostMapping("/booking")
-	public String flightBooking(@Valid @RequestBody Bookingdto data) {
-
-		return bookingService.bookFlight(data);
+	public ResponseEntity<String> flightBooking(@Valid @RequestBody Bookingdto data) {
+		String result=bookingService.bookFlight(data);
+		return ResponseEntity.status(HttpStatus.CREATED).body(result);
 	}
 
 	@GetMapping("/ticket/{pnr}")

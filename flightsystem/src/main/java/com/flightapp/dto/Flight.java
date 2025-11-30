@@ -30,7 +30,7 @@ public class Flight {
 	private int totalSeats;
 	@Min(value = 1, message = "Price must be greater than 0")
 	private double price;
-
+	private Integer flightId;
 	public String getAirlineName() {
 		return airlineName;
 	}
@@ -93,5 +93,13 @@ public class Flight {
 
 	public void setDepatureTime(LocalDateTime depatureTime) {
 		this.depatureTime = depatureTime;
+	}
+
+	public Integer getFlightId() {
+		return flightId;
+	}
+
+	public void setFlightId(Integer flightId) {
+		this.flightId = flightId;
 	}
 }
