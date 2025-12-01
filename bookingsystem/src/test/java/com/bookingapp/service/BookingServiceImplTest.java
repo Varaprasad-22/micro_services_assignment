@@ -77,7 +77,7 @@ public class BookingServiceImplTest {
 
 		bookingEntity = new BookingEntity();
 		bookingEntity.setPnr("PNR1234");
-		bookingEntity.setEmailId("virupavaraprasad@mail.com");
+		bookingEntity.setEmailId("virupavaraprasad@gmail.com");
 		bookingEntity.setFlightId(10);
 	}
 
@@ -148,8 +148,7 @@ public class BookingServiceImplTest {
 	void testGetHistoryByEmail_success() {
 
 		when(bookingRepo.findAllByEmailId("virupavaraprasad@gmail.com")).thenReturn(List.of(bookingEntity));
-		when(userRepo.findById("USER1")).thenReturn(Optional.of(user));
-
+		
 		List<Bookingdto> result = bookingService.getHistoryByEmail("virupavaraprasad@gmail.com");
 
 		assertEquals(1, result.size());
