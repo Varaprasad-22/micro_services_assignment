@@ -39,7 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(BookingException.class)
 	public ResponseEntity<Object> handleBookingException(BookingException e) {
 		Map<String, String> body = new HashMap<>();
-		body.put("message", e.getMessage());
+		body.put(message, e.getMessage());
 		return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
 
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
 		Map<String, String> body = new HashMap<>();
-		body.put("message", e.getMessage());
+		body.put(message, e.getMessage());
 		return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
 

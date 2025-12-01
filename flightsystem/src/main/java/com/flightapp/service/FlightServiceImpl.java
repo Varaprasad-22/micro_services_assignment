@@ -65,7 +65,6 @@ public class FlightServiceImpl implements FlightService {
 	}
 
 	public int addFlightCb(Flight flightRequest,Throwable ex) {
-		 System.out.println("Flight Service Down: " + ex.getMessage());
 		    return -1;
 	}
 	@Override

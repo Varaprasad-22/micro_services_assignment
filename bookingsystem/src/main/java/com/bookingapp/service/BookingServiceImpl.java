@@ -31,17 +31,22 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @Service
 public class BookingServiceImpl implements BookingService {
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final FlightServiceClient flightserviceclient;
+    private final BookingProducer producer;
 
-	@Autowired
-	private BookingRepository bookingRepository;
-	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
-	private FlightServiceClient flightserviceclient;
-	@Autowired
-	private BookingProducer producer;
-
+    public BookingServiceImpl(
+            BookingRepository bookingRepository,
+            UserRepository userRepository,
+            FlightServiceClient flightserviceclient,
+            BookingProducer producer
+    ) {
+        this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
+        this.flightserviceclient = flightserviceclient;
+        this.producer = producer;
+    }
 	@Override
 	@CircuitBreaker(name="BookingServiceCb",fallbackMethod="boooking")
 	public String bookFlight(Bookingdto data) {
@@ -158,7 +163,7 @@ public class BookingServiceImpl implements BookingService {
 	
 	public BookingGetResponse ByPnr(String pnr,Throwable ex) {
 		BookingGetResponse response=new BookingGetResponse();
-		response.setPnr(pnr);
+		response.setPnr(null);
 		response.setMessage("failed to Send Request Server Down");
 		response.setFlightId(null);
 		return response;

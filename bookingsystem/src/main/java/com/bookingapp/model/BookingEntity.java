@@ -45,14 +45,6 @@ public class BookingEntity {
 		this.pnr = pnr;
 	}
 
-	public String getUser() {
-		return userId;
-	}
-
-	public void setUser(String user) {
-		this.userId = user;
-	}
-
 
 	public int getNoOfSeats() {
 		return noOfSeats;
