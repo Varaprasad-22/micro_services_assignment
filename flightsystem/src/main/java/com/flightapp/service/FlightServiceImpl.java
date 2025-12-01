@@ -1,17 +1,14 @@
 package com.flightapp.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.flightapp.controller.FlightController;
 import com.flightapp.dto.Flight;
 import com.flightapp.model.Airline;
 import com.flightapp.model.FlightEntity;
@@ -37,7 +34,6 @@ public class FlightServiceImpl implements FlightService {
 	@Override
 //	@CircuitBreaker(name="flightServiceCb",fallbackMethod = "addFlightCb")
 	public int addFlight(Flight flightRequest) {
-		// TODO Auto-generated method stub
 		try {
 			FlightEntity flightEntity = new FlightEntity();
 			Optional<Airline> airlines = airlineRepository.findByAirlineName(flightRequest.getAirlineName());
@@ -75,7 +71,6 @@ public class FlightServiceImpl implements FlightService {
 	@Override
 	@CircuitBreaker(name="flightServiceCb",fallbackMethod = "SearchCb")
 	public SearchResult search(Search searchRequest) {
-		// TODO Auto-generated method stub
 		SearchResult result = new SearchResult();
 
 		LocalDateTime startOfDay = searchRequest.getDepartureDate().atStartOfDay();
@@ -128,7 +123,6 @@ public class FlightServiceImpl implements FlightService {
 			flightRequestDto.setDepatureTime(entity.getDepatureTime());
 			flightRequestDto.setArrivalTime(entity.getArrivalTime());
 
-			// TODO: Add your logic to find airlineName from entity.getAirlineId()
 
 			return flightRequestDto;
 		}).collect(Collectors.toList());
@@ -136,7 +130,6 @@ public class FlightServiceImpl implements FlightService {
 
 	@Override
 	public ResponseEntity<Flight> getById(Integer flightId) {
-		// TODO Auto-generated method stub
 		Optional<FlightEntity> flightdata=flightRepository.findById(flightId);
 		if(flightdata.isEmpty()) {
 			throw new ResourceNotFoundException("No flight with that id");
@@ -164,7 +157,6 @@ public class FlightServiceImpl implements FlightService {
 	@Override
 	@Transactional
 	public void updateDetails(Integer flightId, Integer changeInSeats) {
-		// TODO Auto-generated method stub
 		Optional<FlightEntity> flightdata=flightRepository.findById(flightId);
 		if(flightdata.isEmpty()) {
 			throw new ResourceNotFoundException("No flight with that id");

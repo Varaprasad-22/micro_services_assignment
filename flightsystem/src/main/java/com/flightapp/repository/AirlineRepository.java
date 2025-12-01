@@ -2,8 +2,6 @@ package com.flightapp.repository;
 
 import java.util.Optional;
 
-import javax.swing.JPanel;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
