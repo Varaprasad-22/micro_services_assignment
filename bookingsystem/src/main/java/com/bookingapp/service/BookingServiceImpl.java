@@ -149,10 +149,13 @@ public class BookingServiceImpl implements BookingService {
 		if (!bookingOpt.isPresent()) {
 			throw new ResourceNotFoundException("Cancellation Failed: PNR not found.");
 		}
+		
 		BookingEntity bookingEntity = bookingOpt.get();
-		LocalDateTime flightDepartureTime = bookingEntity.getBookingTime();
-		LocalDateTime currentTime = LocalDateTime.now();
-		long hoursRemaining = Duration.between(currentTime, flightDepartureTime).toHours();
+		FlightDto flightDetails = flightserviceclient.getFlightDetails(
+	            bookingEntity.getFlight()
+	    ).orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
+		 LocalDateTime departureTime = flightDetails.getDepatureTime();
+		 long hoursRemaining = Duration.between(LocalDateTime.now(), departureTime).toHours();
 
 		if (hoursRemaining < 24) {
 			throw new BookingException(

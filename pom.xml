@@ -35,5 +35,6 @@
     <module>flightsystem</module>
     <module>bookingsystem</module>
     <module>eureka</module>
+    <module>api-gateway</module>
   </modules>
 </project>
