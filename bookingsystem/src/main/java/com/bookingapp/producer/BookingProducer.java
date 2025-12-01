@@ -16,6 +16,5 @@ public class BookingProducer {
 
     public void sendBookingMessage(String email) {
         rabbitTemplate.convertAndSend(RabbitConfig.QUEUE_NAME, email);
-        System.out.println("📩 Sent to Queue → " + email);
     }
 }

@@ -20,6 +20,17 @@
 
     <properties>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <sonar.exclusions>
+            **/exceptions/**,
+            **/model/**,
+            **/dto/**
+        </sonar.exclusions>
+
+        <sonar.cpd.exclusions>
+            **/exceptions/**,
+            **/model/**,
+            **/dto/**
+        </sonar.cpd.exclusions>
     </properties>
 
     <dependencyManagement>

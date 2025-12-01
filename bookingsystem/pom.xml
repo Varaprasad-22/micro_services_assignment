@@ -91,7 +91,8 @@
                             <exclude>**/entity/**</exclude>
                             <exclude>**/model/**</exclude>
                             <exclude>**/*Entity.class</exclude>
-
+ 							<exclude>**/exceptions/**</exclude>
+                            <exclude>**/*Exception.class</exclude>
                             
                         </excludes>
                     </configuration>

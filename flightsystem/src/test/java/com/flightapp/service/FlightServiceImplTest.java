@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.flightapp.dto.Flight;
 import com.flightapp.dto.Search;
 import com.flightapp.dto.SearchResult;
+import com.flightapp.exceptions.ResourceNotFoundException;
 import com.flightapp.model.Airline;
 import com.flightapp.model.FlightEntity;
 import com.flightapp.repository.AirlineRepository;
@@ -81,6 +82,20 @@ public class FlightServiceImplTest {
 	}
 
 	@Test
+	void addFlight_airlineNotFound() {
+		when(airlineRepo.findByAirlineName("Air India")).thenReturn(Optional.empty());
+		assertThrows(RuntimeException.class, () -> flightService.addFlight(flightDto));
+	}
+
+	@Test
+	void addFlight_duplicateFlight() {
+		when(airlineRepo.findByAirlineName("Air India")).thenReturn(Optional.of(airline));
+		when(flightRepo.findByFlightNumber("ABC-123")).thenReturn(Optional.of(entity));
+
+		assertThrows(RuntimeException.class, () -> flightService.addFlight(flightDto));
+	}
+
+	@Test
 	void testSearchFlights_success() {
 
 		Search searchDto = new Search();
@@ -109,6 +124,18 @@ public class FlightServiceImplTest {
 
 		assertEquals("Air India", res.getBody().getAirlineName());
 		assertEquals("HYD", res.getBody().getFromPlace());
+	}
+
+	@Test
+	void getFlightDetails_notFound() {
+		when(flightRepo.findById(10)).thenReturn(Optional.empty());
+		assertThrows(ResourceNotFoundException.class, () -> flightService.getById(10));
+	}
+
+	@Test
+	void updateSeats_flightNotFound() {
+		when(flightRepo.findById(10)).thenReturn(Optional.empty());
+		assertThrows(ResourceNotFoundException.class, () -> flightService.updateDetails(10, -1));
 	}
 
 	@Test
