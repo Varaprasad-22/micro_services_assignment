@@ -49,7 +49,7 @@ public class FlightBookingController {
 	}
 
 	@DeleteMapping("/booking/cancel/{pnr}")
-	public String cancelBooking(@PathVariable String pnr) {
+	public String cancelBooking(@Valid @PathVariable String pnr) {
 		return bookingService.cancelTicket(pnr);
 	}
 }

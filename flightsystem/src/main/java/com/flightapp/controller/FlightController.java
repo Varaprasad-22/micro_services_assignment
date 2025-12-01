@@ -27,7 +27,7 @@ public class FlightController {
 	private FlightService flightService;
 
 	@PostMapping("/airline/inventory/addFlight")
-	public ResponseEntity<Integer> addFlight(@RequestBody Flight flightEntry){
+	public ResponseEntity<Integer> addFlight(@Valid @RequestBody Flight flightEntry){
 		int flightId=flightService.addFlight(flightEntry);
 		return ResponseEntity.status(HttpStatus.CREATED).body(flightId);
 	}
