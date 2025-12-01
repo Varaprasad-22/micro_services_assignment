@@ -8,6 +8,7 @@ public class SearchResult {
 
 	private List<Flight> outboundFlights;
 	private List<Flight> inboundFlights;
+	private String message;
 
 	public List<Flight> getOutboundFlights() {
 		return outboundFlights;
@@ -23,5 +24,13 @@ public class SearchResult {
 
 	public void setInboundFlights(List<Flight> inboundFlights) {
 		this.inboundFlights = inboundFlights;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

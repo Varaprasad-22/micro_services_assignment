@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class BookingGetResponse {
 	private String flightId;
 	private String pnr;
+	private String message;
 	private List<Passengers> passengersList;
 
 	public String getFlightId() {
@@ -36,5 +37,13 @@ public class BookingGetResponse {
 
 	public void setPassengersList(List<Passengers> passengersList) {
 		this.passengersList = passengersList;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

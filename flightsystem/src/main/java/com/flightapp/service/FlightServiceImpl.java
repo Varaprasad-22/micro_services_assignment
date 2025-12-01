@@ -21,6 +21,7 @@ import com.flightapp.exceptions.ResourceNotFoundException;
 import com.flightapp.repository.AirlineRepository;
 import com.flightapp.repository.FlightRepository;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -34,6 +35,7 @@ public class FlightServiceImpl implements FlightService {
 
 
 	@Override
+//	@CircuitBreaker(name="flightServiceCb",fallbackMethod = "addFlightCb")
 	public int addFlight(Flight flightRequest) {
 		// TODO Auto-generated method stub
 		try {
@@ -45,7 +47,7 @@ public class FlightServiceImpl implements FlightService {
 			}
 			Optional<FlightEntity> flightOpt = flightRepository.findByFlightNumber(flightRequest.getFlightNumber());
 			if (flightOpt.isPresent()) {
-			    throw new ResourceNotFoundException("Flight with number " + flightRequest.getFlightNumber() + " does NOT exist.");
+			    throw new ResourceNotFoundException("Flight with number " + flightRequest.getFlightNumber() + " does  exist.");
 			}
 			Airline airline = airlines.get();
 			flightEntity.setAirlineId(airline.getAirlineId());
@@ -66,7 +68,12 @@ public class FlightServiceImpl implements FlightService {
 
 	}
 
+	public int addFlightCb(Flight flightRequest,Throwable ex) {
+		 System.out.println("Flight Service Down: " + ex.getMessage());
+		    return -1;
+	}
 	@Override
+	@CircuitBreaker(name="flightServiceCb",fallbackMethod = "SearchCb")
 	public SearchResult search(Search searchRequest) {
 		// TODO Auto-generated method stub
 		SearchResult result = new SearchResult();
@@ -97,6 +104,13 @@ public class FlightServiceImpl implements FlightService {
 		return result;
 	}
 
+	public SearchResult SearchCb() {
+		
+		SearchResult searchCb=new SearchResult();
+		searchCb.setMessage("Failed Server Flight Try Later On");
+		return null;
+	}
+	
 	private List<Flight> mapEntitiesToDTOs(List<FlightEntity> flightEntities) {
 		return flightEntities.stream().map(entity -> {
 			Flight flightRequestDto = new Flight();

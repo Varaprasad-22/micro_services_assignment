@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.bookingapp.client.FlightServiceClient;
@@ -21,8 +22,11 @@ import com.bookingapp.exceptions.ResourceNotFoundException;
 import com.bookingapp.model.BookingEntity;
 import com.bookingapp.model.PassengerEntity;
 import com.bookingapp.model.User;
+import com.bookingapp.producer.BookingProducer;
 import com.bookingapp.repository.BookingRepository;
 import com.bookingapp.repository.UserRepository;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 
 @Service
@@ -35,8 +39,11 @@ public class BookingServiceImpl implements BookingService {
 	
 	@Autowired
 	private FlightServiceClient flightserviceclient;
+	@Autowired
+	private BookingProducer producer;
 
 	@Override
+	@CircuitBreaker(name="BookingServiceCb",fallbackMethod="boooking")
 	public String bookFlight(Bookingdto data) {
 		
 		User user = getOrCreateUser(data.getEmailId(), data.getName());
@@ -95,9 +102,17 @@ public class BookingServiceImpl implements BookingService {
 		}
 
 		bookingRepository.save(bookingEntity);
+		producer.sendBookingMessage(data.getEmailId());
 
 		return "One-way Booking Successful! PNR: " + bookingEntity.getPnr();
 	}
+	
+	public ResponseEntity<String> boooking(Bookingdto data, Throwable ex) {
+	    return ResponseEntity
+	            .status(503)
+	            .body("Booking Service is DOWN. Try again later.");
+	}
+
 
 	private User getOrCreateUser(String email, String name) {
 		Optional<User> userOpt = userRepository.findByEmail(email);
@@ -114,6 +129,7 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
+	@CircuitBreaker(name="BookingServiceCb",fallbackMethod = "ByPnr")
 	public BookingGetResponse getBookingDetails(String pnr) {
 		// TODO Auto-generated method stub
 		Optional<BookingEntity> bookingOpt = bookingRepository.findByPnr(pnr);
@@ -141,8 +157,17 @@ public class BookingServiceImpl implements BookingService {
 		response.setPassengersList(passengersList);
 		return response;
 	}
+	
+	public BookingGetResponse ByPnr(String pnr,Throwable ex) {
+		BookingGetResponse response=new BookingGetResponse();
+		response.setPnr(pnr);
+		response.setMessage("failed to Send Request Server Down");
+		response.setFlightId(null);
+		return response;
+	}
 
 	@Override
+	@CircuitBreaker(name="BookingServiceCb",fallbackMethod = "cancleTicketCb")
 	public String cancelTicket(String pnr) {
 		// TODO Auto-generated method stub
 		Optional<BookingEntity> bookingOpt = bookingRepository.findByPnr(pnr);
@@ -152,7 +177,7 @@ public class BookingServiceImpl implements BookingService {
 		
 		BookingEntity bookingEntity = bookingOpt.get();
 		FlightDto flightDetails = flightserviceclient.getFlightDetails(
-	            bookingEntity.getFlight()
+	            bookingEntity.getFlightId()
 	    ).orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
 		 LocalDateTime departureTime = flightDetails.getDepatureTime();
 		 long hoursRemaining = Duration.between(LocalDateTime.now(), departureTime).toHours();
@@ -168,7 +193,11 @@ public class BookingServiceImpl implements BookingService {
 		return "Ticket with PNR " + pnr + " successfully cancelled.";
 	}
 
+	public String cancleTicketCb(String pnr,Throwable ex) {
+		return "The server is Down";
+	}
 	@Override
+	@CircuitBreaker(name="BookingServiceCb",fallbackMethod = "ByEmail")
 	public List<Bookingdto> getHistoryByEmail(String emailId) {
 		// TODO Auto-generated method stub
 		List<Bookingdto> bookingData = new ArrayList<>();
@@ -210,6 +239,13 @@ public class BookingServiceImpl implements BookingService {
 			e.printStackTrace();
 		}
 		return bookingData;
+	}
+	public List<Bookingdto> ByEmail(String Email, Throwable ex){
+		Bookingdto forCb=new Bookingdto();
+		forCb.setEmailId(Email);
+		forCb.setName("The Server is Down Failed to Load");
+		
+		return List.of(forCb);
 	}
 
 }
