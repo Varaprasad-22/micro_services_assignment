@@ -1,6 +1,5 @@
 package com.bookingapp.model;
 
-import java.sql.Date;
 import org.springframework.data.annotation.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,11 +7,6 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
-@Data
 @Document(collection="booking")
 public class BookingEntity {
 	
@@ -59,15 +53,7 @@ public class BookingEntity {
 		this.userId = user;
 	}
 
-	public Integer getFlight() {
-		return flightId;
-	}
 
-	public void setFlight(Integer flight) {
-		this.flightId = flight;
-	}
-
-	
 	public int getNoOfSeats() {
 		return noOfSeats;
 	}

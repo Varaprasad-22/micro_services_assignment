@@ -120,7 +120,6 @@ public class BookingServiceImpl implements BookingService {
 		if (userOpt.isPresent()) {
 			return userOpt.get();
 		} else {
-			// Create a new User
 			User newUser = new User();
 			newUser.setEmail(email);
 			newUser.setName(name);
@@ -131,7 +130,6 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	@CircuitBreaker(name="BookingServiceCb",fallbackMethod = "ByPnr")
 	public BookingGetResponse getBookingDetails(String pnr) {
-		// TODO Auto-generated method stub
 		Optional<BookingEntity> bookingOpt = bookingRepository.findByPnr(pnr);
 		if (!bookingOpt.isPresent()) {
 			throw new ResourceNotFoundException("No booking found with PNR: " + pnr);
@@ -169,7 +167,6 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	@CircuitBreaker(name="BookingServiceCb",fallbackMethod = "cancleTicketCb")
 	public String cancelTicket(String pnr) {
-		// TODO Auto-generated method stub
 		Optional<BookingEntity> bookingOpt = bookingRepository.findByPnr(pnr);
 		if (!bookingOpt.isPresent()) {
 			throw new ResourceNotFoundException("Cancellation Failed: PNR not found.");
@@ -186,7 +183,6 @@ public class BookingServiceImpl implements BookingService {
 			throw new BookingException(
 					"Cancellation Failed: Cannot cancel ticket less than 24 hours before journey date.");
 		}
-//		FlightDto flightEntity = bookingEntity.getFlight();
 		flightserviceclient.updateSeats(bookingEntity.getFlightId(),bookingEntity.getNoOfSeats());
 		bookingEntity.setStatus(false);
 		bookingRepository.save(bookingEntity);
@@ -199,7 +195,6 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	@CircuitBreaker(name="BookingServiceCb",fallbackMethod = "ByEmail")
 	public List<Bookingdto> getHistoryByEmail(String emailId) {
-		// TODO Auto-generated method stub
 		List<Bookingdto> bookingData = new ArrayList<>();
 		try {
 			List<BookingEntity> bookingEntityList = bookingRepository.findAllByEmailId(emailId);

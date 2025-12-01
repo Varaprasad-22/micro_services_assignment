@@ -1,14 +1,8 @@
 package com.bookingapp.model;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.Data;
-import lombok.ToString;
-
-@Data
 @Document(collection="passengers")
 public class PassengerEntity {
 	private int passengerId;
