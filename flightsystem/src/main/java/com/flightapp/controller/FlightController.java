@@ -1,6 +1,5 @@
 package com.flightapp.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +21,11 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1.0/flights")
 public class FlightController {
-	
-	@Autowired
-	private FlightService flightService;
+	private final FlightService flightService; 
+
+    public FlightController(FlightService flightService) {
+        this.flightService = flightService;
+    }
 
 	@PostMapping("/airline/inventory/addFlight")
 	public ResponseEntity<Integer> addFlight(@Valid @RequestBody Flight flightEntry){

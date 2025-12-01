@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.flightapp.dto.Flight;
@@ -24,12 +23,13 @@ import jakarta.transaction.Transactional;
 @Service
 public class FlightServiceImpl implements FlightService {
 
+	private final FlightRepository flightRepository;
+	private final AirlineRepository airlineRepository;
 
-	@Autowired
-	private FlightRepository flightRepository;
-	@Autowired
-	private AirlineRepository airlineRepository;
-
+	public FlightServiceImpl(FlightRepository flightRepository, AirlineRepository airlineRepository) {
+		this.flightRepository = flightRepository;
+		this.airlineRepository = airlineRepository;
+	}
 
 	@Override
 //	@CircuitBreaker(name="flightServiceCb",fallbackMethod = "addFlightCb")
@@ -43,7 +43,8 @@ public class FlightServiceImpl implements FlightService {
 			}
 			Optional<FlightEntity> flightOpt = flightRepository.findByFlightNumber(flightRequest.getFlightNumber());
 			if (flightOpt.isPresent()) {
-			    throw new ResourceNotFoundException("Flight with number " + flightRequest.getFlightNumber() + " does  exist.");
+				throw new ResourceNotFoundException(
+						"Flight with number " + flightRequest.getFlightNumber() + " does  exist.");
 			}
 			Airline airline = airlines.get();
 			flightEntity.setAirlineId(airline.getAirlineId());
@@ -55,7 +56,7 @@ public class FlightServiceImpl implements FlightService {
 			flightEntity.setDepatureTime(flightRequest.getDepatureTime());
 			flightEntity.setTotalSeats(flightRequest.getTotalSeats());
 			flightEntity.setAvaliSeats(flightRequest.getTotalSeats());
-			FlightEntity savedFlight=flightRepository.save(flightEntity);
+			FlightEntity savedFlight = flightRepository.save(flightEntity);
 			return savedFlight.getFlightId();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -64,11 +65,12 @@ public class FlightServiceImpl implements FlightService {
 
 	}
 
-	public int addFlightCb(Flight flightRequest,Throwable ex) {
-		    return -1;
+	public int addFlightCb(Flight flightRequest, Throwable ex) {
+		return -1;
 	}
+
 	@Override
-	@CircuitBreaker(name="flightServiceCb",fallbackMethod = "SearchCb")
+	@CircuitBreaker(name = "flightServiceCb", fallbackMethod = "SearchCb")
 	public SearchResult search(Search searchRequest) {
 		SearchResult result = new SearchResult();
 
@@ -78,8 +80,8 @@ public class FlightServiceImpl implements FlightService {
 		List<FlightEntity> outboundEntities = flightRepository.findByFromLocationAndToLocationAndDepatureTimeBetween(
 				searchRequest.getFromPlace(), searchRequest.getToPlace(), startOfDay, endOfDay);
 		result.setOutboundFlights(mapEntitiesToDTOs(outboundEntities));
-		 if (outboundEntities.isEmpty()) {
-		        throw new ResourceNotFoundException("No flights found");
+		if (outboundEntities.isEmpty()) {
+			throw new ResourceNotFoundException("No flights found");
 		}
 
 		if ("round-trip".equalsIgnoreCase(searchRequest.getTripType()) && searchRequest.getReturnDate() != null) {
@@ -90,8 +92,8 @@ public class FlightServiceImpl implements FlightService {
 			List<FlightEntity> inboundEntities = flightRepository.findByFromLocationAndToLocationAndDepatureTimeBetween(
 					searchRequest.getToPlace(), searchRequest.getFromPlace(), returnStart, returnEnd);
 			if (inboundEntities.isEmpty()) {
-	            throw new ResourceNotFoundException("No return flights found");
-	        }
+				throw new ResourceNotFoundException("No return flights found");
+			}
 			result.setInboundFlights(mapEntitiesToDTOs(inboundEntities));
 		}
 
@@ -99,12 +101,12 @@ public class FlightServiceImpl implements FlightService {
 	}
 
 	public SearchResult SearchCb() {
-		
-		SearchResult searchCb=new SearchResult();
+
+		SearchResult searchCb = new SearchResult();
 		searchCb.setMessage("Failed Server Flight Try Later On");
 		return null;
 	}
-	
+
 	private List<Flight> mapEntitiesToDTOs(List<FlightEntity> flightEntities) {
 		return flightEntities.stream().map(entity -> {
 			Flight flightRequestDto = new Flight();
@@ -122,46 +124,44 @@ public class FlightServiceImpl implements FlightService {
 			flightRequestDto.setDepatureTime(entity.getDepatureTime());
 			flightRequestDto.setArrivalTime(entity.getArrivalTime());
 
-
 			return flightRequestDto;
 		}).collect(Collectors.toList());
 	}
 
 	@Override
 	public ResponseEntity<Flight> getById(Integer flightId) {
-		Optional<FlightEntity> flightdata=flightRepository.findById(flightId);
-		if(flightdata.isEmpty()) {
+		Optional<FlightEntity> flightdata = flightRepository.findById(flightId);
+		if (flightdata.isEmpty()) {
 			throw new ResourceNotFoundException("No flight with that id");
 		}
-		FlightEntity entity=flightdata.get();
+		FlightEntity entity = flightdata.get();
 		Flight dto = new Flight();
-		Optional<Airline> air=airlineRepository.findByAirlineId(entity.getAirlineId());
-		if(air.isEmpty())
-		{
+		Optional<Airline> air = airlineRepository.findByAirlineId(entity.getAirlineId());
+		if (air.isEmpty()) {
 			throw new ResourceNotFoundException("No airline with that id");
 		}
-		Airline air1=air.get();
+		Airline air1 = air.get();
 		dto.setAirlineName(air1.getAirlineName());
-        dto.setFlightId(flightId);
-        dto.setFlightNumber(entity.getFlightNumber());
-        dto.setFromPlace(entity.getFromLocation());
-        dto.setArrivalTime(entity.getArrivalTime());
-        dto.setDepatureTime(entity.getDepatureTime());
-        dto.setToPlace(entity.getToLocation());
-        dto.setTotalSeats(entity.getAvaliSeats());
-        dto.setPrice(entity.getPrice());
+		dto.setFlightId(flightId);
+		dto.setFlightNumber(entity.getFlightNumber());
+		dto.setFromPlace(entity.getFromLocation());
+		dto.setArrivalTime(entity.getArrivalTime());
+		dto.setDepatureTime(entity.getDepatureTime());
+		dto.setToPlace(entity.getToLocation());
+		dto.setTotalSeats(entity.getAvaliSeats());
+		dto.setPrice(entity.getPrice());
 		return ResponseEntity.ok(dto);
 	}
 
 	@Override
 	@Transactional
 	public void updateDetails(Integer flightId, Integer changeInSeats) {
-		Optional<FlightEntity> flightdata=flightRepository.findById(flightId);
-		if(flightdata.isEmpty()) {
+		Optional<FlightEntity> flightdata = flightRepository.findById(flightId);
+		if (flightdata.isEmpty()) {
 			throw new ResourceNotFoundException("No flight with that id");
 		}
-		FlightEntity entity=flightdata.get();
-		entity.setAvaliSeats(entity.getAvaliSeats()+changeInSeats);
+		FlightEntity entity = flightdata.get();
+		entity.setAvaliSeats(entity.getAvaliSeats() + changeInSeats);
 		flightRepository.save(entity);
 		return;
 	}

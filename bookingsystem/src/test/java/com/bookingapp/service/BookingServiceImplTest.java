@@ -93,6 +93,35 @@ public class BookingServiceImplTest {
 		assertTrue(result.contains("One-way Booking Successful"));
 		verify(flightClient, times(1)).updateSeats(10, -1);
 	}
+	@Test
+	void testBookFlight_success_roundTrip() {
+		Integer returnFlightId = 20;
+		bookingDto.setReturnFlightId(returnFlightId);
+
+		FlightDto returnFlightDto = new FlightDto();
+		returnFlightDto.setFlightId(returnFlightId);
+		returnFlightDto.setTotalSeats(10);
+		
+		when(userRepo.findByEmail(any())).thenReturn(Optional.of(user));
+		when(flightClient.getFlightDetails(10)).thenReturn(Optional.of(flightDto));
+		when(flightClient.getFlightDetails(returnFlightId)).thenReturn(Optional.of(returnFlightDto));
+		when(bookingRepo.save(any())).thenReturn(bookingEntity);
+
+		String result = bookingService.bookFlight(bookingDto);
+
+		// Assert
+		assertTrue(result.contains("Round-trip Booking Successful"));
+		verify(flightClient, times(2)).updateSeats(anyInt(), eq(-1));
+		verify(producer, never()).sendBookingMessage(anyString()); 
+	}
+	@Test
+	void testBookFlight_outboundFlightNotFound() {
+		when(userRepo.findByEmail(any())).thenReturn(Optional.of(user));
+		when(flightClient.getFlightDetails(10)).thenReturn(Optional.empty());
+
+		assertThrows(ResourceNotFoundException.class, () -> bookingService.bookFlight(bookingDto));
+		verify(flightClient, never()).updateSeats(anyInt(), anyInt());
+	}
 
 	@Test
 	void testBookFlight_insufficientSeats() {
@@ -153,6 +182,22 @@ public class BookingServiceImplTest {
 
 		assertEquals(1, result.size());
 		assertEquals("virupavaraprasad@gmail.com", result.get(0).getEmailId());
+	}
+	@Test
+	void getHistoryByEmail_noUserId() {
+		String email = "virupavaraprasad@gmail.com";
+		bookingEntity.setUserId(null);
+		bookingEntity.setNoOfSeats(2);
+
+		when(bookingRepo.findAllByEmailId(email)).thenReturn(List.of(bookingEntity));
+		
+		List<Bookingdto> result = bookingService.getHistoryByEmail(email);
+
+		assertFalse(result.isEmpty());
+		assertEquals(2, result.get(0).getNoOfSeats());
+		assertNull(result.get(0).getName()); 
+		
+		verify(userRepo, never()).findById(anyString());
 	}
 
 }
