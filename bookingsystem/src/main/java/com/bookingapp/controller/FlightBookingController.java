@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,14 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bookingapp.dto.BookingGetResponse;
 import com.bookingapp.dto.Bookingdto;
-import com.bookingapp.dto.Flight;
-import com.bookingapp.dto.Search;
-import com.bookingapp.dto.SearchResult;
 import com.bookingapp.service.BookingService;
-import com.bookingapp.service.BookingServiceImpl;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 
 @RestController
 @RequestMapping("/api/v1.0/flight")
