@@ -19,7 +19,7 @@ import com.bookingapp.service.BookingService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1.0/flight")
+@RequestMapping("/api/flight")
 public class FlightBookingController {
 	private final BookingService bookingService;
 

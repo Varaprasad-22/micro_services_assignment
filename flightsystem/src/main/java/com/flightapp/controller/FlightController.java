@@ -19,7 +19,7 @@ import com.flightapp.service.FlightService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1.0/flights")
+@RequestMapping("/api/flights")
 public class FlightController {
 	private final FlightService flightService; 
 
@@ -27,7 +27,7 @@ public class FlightController {
         this.flightService = flightService;
     }
 
-	@PostMapping("/airline/inventory/addFlight")
+	@PostMapping("/airline/inventory")
 	public ResponseEntity<Integer> addFlight(@Valid @RequestBody Flight flightEntry){
 		int flightId=flightService.addFlight(flightEntry);
 		return ResponseEntity.status(HttpStatus.CREATED).body(flightId);

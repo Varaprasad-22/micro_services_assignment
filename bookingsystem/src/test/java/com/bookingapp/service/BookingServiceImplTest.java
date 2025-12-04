@@ -113,7 +113,7 @@ public class BookingServiceImplTest {
 		// Assert
 		assertTrue(result.contains("Round-trip Booking Successful"));
 		verify(flightClient, times(2)).updateSeats(anyInt(), eq(-1));
-		verify(producer, never()).sendBookingMessage(anyString());
+		verify(producer, never()).sendBookingMessage(any());
 	}
 
 	@Test

@@ -4,6 +4,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import com.bookingapp.config.RabbitConfig;
+import com.bookingapp.dto.BookingGetResponse;
 
 @Component
 public class BookingProducer {
@@ -14,7 +15,7 @@ public class BookingProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendBookingMessage(String email) {
-        rabbitTemplate.convertAndSend(RabbitConfig.QUEUE_NAME, email);
+    public void sendBookingMessage(BookingGetResponse data) {
+        rabbitTemplate.convertAndSend(RabbitConfig.QUEUE_NAME, data);
     }
 }

@@ -65,7 +65,8 @@ public class BookingServiceImpl implements BookingService {
 		bookingEntity.setNoOfSeats(data.getNoOfSeats());
 		bookingEntity.setStatus(true);
 		bookingEntity.setBookingTime(LocalDateTime.now());
-		bookingEntity.setPnr(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+		String pnr=(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+		bookingEntity.setPnr(pnr);
 		data.getPassengers().forEach(passengerRequest -> {
 			PassengerEntity passengerEntity = new PassengerEntity();
 			passengerEntity.setName(passengerRequest.getName());
@@ -99,7 +100,8 @@ public class BookingServiceImpl implements BookingService {
 		}
 
 		bookingRepository.save(bookingEntity);
-		producer.sendBookingMessage(data.getEmailId());
+		BookingGetResponse datarabbitMq=getBookingDetails(pnr);
+		producer.sendBookingMessage(datarabbitMq);
 
 		return "One-way Booking Successful! PNR: " + bookingEntity.getPnr();
 	}

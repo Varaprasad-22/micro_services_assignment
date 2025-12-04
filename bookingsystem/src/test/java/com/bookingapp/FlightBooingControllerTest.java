@@ -64,7 +64,7 @@ public class FlightBooingControllerTest {
 
 		when(bookingService.bookFlight(any())).thenReturn("One-way Booking Successful! PNR: ABC123");
 
-		mockMvc.perform(post("/api/v1.0/flight/booking").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/flight/booking").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bookingDto))).andExpect(status().isCreated())
 				.andExpect(content().string("One-way Booking Successful! PNR: ABC123"));
 	}
@@ -74,7 +74,7 @@ public class FlightBooingControllerTest {
 
 		when(bookingService.getBookingDetails("ABC123")).thenReturn(bookingResponse);
 
-		mockMvc.perform(get("/api/v1.0/flight/ticket/ABC123")).andExpect(status().isOk())
+		mockMvc.perform(get("/api/flight/ticket/ABC123")).andExpect(status().isOk())
 				.andExpect(jsonPath("$.pnr").value("ABC123"));
 	}
 
@@ -83,7 +83,7 @@ public class FlightBooingControllerTest {
 
 		when(bookingService.getHistoryByEmail("virupavaraprasad22@gmail.com")).thenReturn(List.of(bookingDto));
 
-		mockMvc.perform(get("/api/v1.0/flight/booking/history/virupavaraprasad22@gmail.com")).andExpect(status().isOk())
+		mockMvc.perform(get("/api/flight/booking/history/virupavaraprasad22@gmail.com")).andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].emailId").value("virupavaraprasad22@gmail.com"));
 	}
 
@@ -92,7 +92,7 @@ public class FlightBooingControllerTest {
 
 		when(bookingService.cancelTicket("ABC123")).thenReturn("Ticket with PNR ABC123 successfully cancelled.");
 
-		mockMvc.perform(delete("/api/v1.0/flight/booking/cancel/ABC123")).andExpect(status().isOk())
+		mockMvc.perform(delete("/api/flight/booking/cancel/ABC123")).andExpect(status().isOk())
 				.andExpect(content().string("Ticket with PNR ABC123 successfully cancelled."));
 	}
 }
