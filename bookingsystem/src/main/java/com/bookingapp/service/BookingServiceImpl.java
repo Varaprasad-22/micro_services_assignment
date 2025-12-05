@@ -46,6 +46,9 @@ public class BookingServiceImpl implements BookingService {
 	@CircuitBreaker(name = "BookingServiceCb", fallbackMethod = "boooking")
 	public String bookFlight(Bookingdto data) {
 
+		if(data.getPassengers().size()!=data.getNoOfSeats()) {
+			throw new BookingException("No Of Seats and tickets didn't match");
+		}
 		User user = getOrCreateUser(data.getEmailId(), data.getName());
 		String userId = user.getUserId();
 
@@ -78,7 +81,16 @@ public class BookingServiceImpl implements BookingService {
 			passengerEntity.setSeatNo(passengerRequest.getSeatNo());
 			bookingEntity.addPassenger(passengerEntity);
 		});
-		
+		List<BookingEntity> existingdata=bookingRepository.findAllByFlightId(data.getOutboundFlightId());
+		for(BookingEntity exis:existingdata) {
+			for(PassengerEntity passengersFromDb:exis.getPassengers()) {
+				for(Passengers passenger:data.getPassengers()) {
+					if(passengersFromDb.getSeatNo().equalsIgnoreCase(passenger.getSeatNo())) {
+						throw new BookingException("Seat "+ passenger.getSeatNo()+" is alredy booked");
+					}
+				}
+			}
+		}
 		flightserviceclient.updateSeats(data.getOutboundFlightId(), data.getNoOfSeats() * -1);
 
 		Integer returnId = data.getReturnFlightId();
@@ -161,14 +173,13 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	@CircuitBreaker(name = "BookingServiceCb", fallbackMethod = "cancleTicketCb")
+//	@CircuitBreaker(name = "BookingServiceCb", fallbackMethod = "cancleTicketCb")
 	public String cancelTicket(String pnr) {
-		Optional<BookingEntity> bookingOpt = bookingRepository.findByPnr(pnr);
-		if (!bookingOpt.isPresent()) {
-			throw new ResourceNotFoundException("Cancellation Failed: PNR not found.");
-		}
-
-		BookingEntity bookingEntity = bookingOpt.get();
+		BookingEntity bookingOpt = bookingRepository.findByPnr(pnr).orElseThrow(()-> new ResourceNotFoundException("Cancellation Failed: PNR not found."));
+//		if (!bookingOpt.isPresent()) {
+//			throw new ResourceNotFoundException("Cancellation Failed: PNR not found.");
+//		}
+		BookingEntity bookingEntity = bookingOpt;
 		FlightDto flightDetails = flightserviceclient.getFlightDetails(bookingEntity.getFlightId())
 				.orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
 		LocalDateTime departureTime = flightDetails.getDepatureTime();

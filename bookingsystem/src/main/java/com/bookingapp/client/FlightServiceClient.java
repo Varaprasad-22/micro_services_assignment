@@ -12,10 +12,10 @@ import com.bookingapp.dto.FlightDto;
 @FeignClient(name="flight-service")
 public interface FlightServiceClient {
 
-	@GetMapping("/api/v1.0/flights/{flightId}")
+	@GetMapping("/api/flights/{flightId}")
     Optional<FlightDto> getFlightDetails(@PathVariable("flightId") Integer flightId);
 	
-	@PutMapping("/api/v1.0/flights/inventory/updateSeats")
+	@PutMapping("/api/flights/inventory/updateSeats")
     void updateSeats(@RequestParam("flightId") Integer flightId, 
                      @RequestParam("changeInSeats") Integer changeInSeats);
 }

@@ -18,4 +18,6 @@ public interface BookingRepository extends MongoRepository<BookingEntity, String
 
 	void deleteByPnr(String pnr);
 
+	List<BookingEntity> findAllByFlightId(Integer outboundFlightId);
+
 }
