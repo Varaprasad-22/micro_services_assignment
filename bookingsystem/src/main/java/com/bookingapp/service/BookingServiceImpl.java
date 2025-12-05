@@ -57,7 +57,9 @@ public class BookingServiceImpl implements BookingService {
 		if (outboundFlight.getTotalSeats() < data.getNoOfSeats()) {
 			throw new BookingException("Not enough seats in outbound flight.");
 		}
-
+		if(LocalDateTime.now().isAfter(outboundFlight.getDepatureTime())||LocalDateTime.now().isEqual(outboundFlight.getDepatureTime())) {
+			throw new BookingException("Flight Already Depatured");
+		}
 		BookingEntity bookingEntity = new BookingEntity();
 		bookingEntity.setUserId(userId);
 		bookingEntity.setEmailId(data.getEmailId());
@@ -76,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
 			passengerEntity.setSeatNo(passengerRequest.getSeatNo());
 			bookingEntity.addPassenger(passengerEntity);
 		});
-
+		
 		flightserviceclient.updateSeats(data.getOutboundFlightId(), data.getNoOfSeats() * -1);
 
 		Integer returnId = data.getReturnFlightId();
@@ -98,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
 
 			return "Round-trip Booking Successful! PNR: " + bookingEntity.getPnr();
 		}
-
+		
 		bookingRepository.save(bookingEntity);
 		BookingGetResponse datarabbitMq=getBookingDetails(pnr);
 		producer.sendBookingMessage(datarabbitMq);
@@ -171,7 +173,9 @@ public class BookingServiceImpl implements BookingService {
 				.orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
 		LocalDateTime departureTime = flightDetails.getDepatureTime();
 		long hoursRemaining = Duration.between(LocalDateTime.now(), departureTime).toHours();
-
+		if(!bookingEntity.isStatus()) {
+			throw new BookingException("Failed Since Flight booking already cancled");
+		}
 		if (hoursRemaining < 24) {
 			throw new BookingException(
 					"Cancellation Failed: Cannot cancel ticket less than 24 hours before journey date.");

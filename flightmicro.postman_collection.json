@@ -1,0 +1,191 @@
+{
+	"info": {
+		"_postman_id": "740b8049-9712-49ac-b0a0-6c68c261dedd",
+		"name": "flightmicro",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46040501"
+	},
+	"item": [
+		{
+			"name": "addFlight",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"airlineName\": \"airIndia\",\r\n    \"flightNumber\": \"ABC-115\",\r\n    \"fromPlace\": \"Hyderabad\",\r\n    \"toPlace\": \"Delhi\",\r\n    \"depatureTime\": \"2025-12-04T10:30:00\",\r\n    \"arrivalTime\": \"2025-12-04T12:45:00\",\r\n    \"totalSeats\": 100,\r\n    \"price\": 20000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8212/api/v1.0/flights/airline/inventory/addFlight",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8212",
+					"path": [
+						"api",
+						"v1.0",
+						"flights",
+						"airline",
+						"inventory",
+						"addFlight"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n   \"fromPlace\": \"\",\r\n   \"toPlace\": \"Hyderabad\",\r\n   \"departureDate\":\"2025-12-04\",\r\n   \"tripType\":\"oneWay\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8212/api/v1.0/flights/search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8212",
+					"path": [
+						"api",
+						"v1.0",
+						"flights",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bookflight",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"emailId\": \"virupavaraprasad22@gmail.com\",\r\n  \"name\": \"Varaprasad\",\r\n  \"noOfSeats\": 0,\r\n  \"outboundFlightId\": 3, \r\n  \"passengers\": [\r\n    { \"name\": \"vara\", \"age\": 20, \"gender\": \"Male\", \"seatNo\": \"12-A\", \"meal\": \"veg\" },\r\n    { \"name\": \"prasad\", \"age\": 23, \"gender\": \"Female\", \"seatNo\": \"13-C\", \"meal\": \"nonVeg\" }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8212/api/v1.0/flight/booking",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8212",
+					"path": [
+						"api",
+						"v1.0",
+						"flight",
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "By Pnr",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8211/api/v1.0/flight/ticket/AA27F023",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8211",
+					"path": [
+						"api",
+						"v1.0",
+						"flight",
+						"ticket",
+						"AA27F023"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "By Email",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8212/api/v1.0/flight/booking/history/virupavaraprasad22@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8212",
+					"path": [
+						"api",
+						"v1.0",
+						"flight",
+						"booking",
+						"history",
+						"virupavaraprasad22@gmail.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Copy",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n   \"fromPlace\": \"Delhis\",\r\n   \"toPlace\": \"Hyderabad\",\r\n   \"departureDate\":\"2025-11-20\",\r\n   \"tripType\":\"oneWay\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8212/api/v1.0/flight/booking/cancel/03C8D857",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8212",
+					"path": [
+						"api",
+						"v1.0",
+						"flight",
+						"booking",
+						"cancel",
+						"03C8D857"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
