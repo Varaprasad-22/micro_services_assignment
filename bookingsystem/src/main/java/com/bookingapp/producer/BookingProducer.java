@@ -16,7 +16,12 @@ public class BookingProducer {
     }
 
     public void sendBookingMessage(BookingGetResponse data) {
+    	data.setMessage("Booking");
         rabbitTemplate.convertAndSend( RabbitConfig.EXCHANGE_NAME,
                 RabbitConfig.ROUTING_KEY, data);	
+    }
+    public void sendCancellationMessage(BookingGetResponse data) {
+    	data.setMessage("Cancel");
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME,RabbitConfig.ROUTING_KEY,data);
     }
 }

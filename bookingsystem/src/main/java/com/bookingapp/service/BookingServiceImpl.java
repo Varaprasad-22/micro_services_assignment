@@ -159,7 +159,7 @@ public class BookingServiceImpl implements BookingService {
 			passengerDto.setSeatNo(entity.getSeatNo());
 			return passengerDto;
 		}).collect(Collectors.toList());
-
+response.setEmail(bookingEntity.getEmailId());
 		response.setPassengersList(passengersList);
 		return response;
 	}
@@ -194,6 +194,8 @@ public class BookingServiceImpl implements BookingService {
 		flightserviceclient.updateSeats(bookingEntity.getFlightId(), bookingEntity.getNoOfSeats());
 		bookingEntity.setStatus(false);
 		bookingRepository.save(bookingEntity);
+		BookingGetResponse datarabbitMq=getBookingDetails(pnr);
+		 producer.sendCancellationMessage(datarabbitMq);
 		return "Ticket with PNR " + pnr + " successfully cancelled.";
 	}
 

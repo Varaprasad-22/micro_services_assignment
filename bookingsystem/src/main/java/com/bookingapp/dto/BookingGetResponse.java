@@ -6,6 +6,7 @@ public class BookingGetResponse {
 	private String flightId;
 	private String pnr;
 	private String message;
+	private String Email;
 	private List<Passengers> passengersList;
 
 	public String getFlightId() {
@@ -38,5 +39,13 @@ public class BookingGetResponse {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public String getEmail() {
+		return Email;
+	}
+
+	public void setEmail(String email) {
+		Email = email;
 	}
 }
