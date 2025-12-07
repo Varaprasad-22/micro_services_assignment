@@ -16,6 +16,7 @@ public class BookingProducer {
     }
 
     public void sendBookingMessage(BookingGetResponse data) {
-        rabbitTemplate.convertAndSend(RabbitConfig.QUEUE_NAME, data);
+        rabbitTemplate.convertAndSend( RabbitConfig.EXCHANGE_NAME,
+                RabbitConfig.ROUTING_KEY, data);	
     }
 }

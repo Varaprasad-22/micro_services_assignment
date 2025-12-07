@@ -1,0 +1,30 @@
+services:
+  flightdb:
+    image: mysql:8
+    container_name: flightdb
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: flightdb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root123
+    ports:
+      - "3307:3306"
+    volumes:
+      - flightdb-data:/var/lib/mysql
+
+  flightsystem:
+    build: .
+    container_name: flightsystem
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://flightdb:3306/flightdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8888
+    depends_on:
+      flightdb:
+        condition: service_healthy
+
+volumes:
+  flightdb-data:
